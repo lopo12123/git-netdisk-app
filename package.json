@@ -16,6 +16,7 @@
     "core-js": "^3.6.5",
     "echarts": "^5.2.2",
     "element-plus": "^1.2.0-beta.3",
+    "simple-git": "^2.48.0",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.0-0",
