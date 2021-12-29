@@ -1,5 +1,9 @@
 <template>
     <div class="custom-button"  @click="$emit('btn-click', btnType)">
+        <el-icon v-if="btnType==='MORE'" size="14">
+            <more-filled></more-filled>
+        </el-icon>
+
         <el-icon v-if="btnType==='MIN'" size="14">
             <bottom-left></bottom-left>
         </el-icon>
@@ -21,9 +25,9 @@
 <script lang="ts">
 import {defineComponent, PropType} from "vue";
 import {ElIcon} from "element-plus";
-import {BottomLeft, FullScreen, Refresh, Close} from '@element-plus/icons'
+import {BottomLeft, FullScreen, Refresh, Close, MoreFilled} from '@element-plus/icons'
 
-export type BtnType = 'MIN' | 'MAX' | 'REFRESH' | 'CLOSE'
+export type BtnType = 'MIN' | 'MAX' | 'REFRESH' | 'CLOSE' | 'MORE'
 
 export default defineComponent({
     props: {
@@ -31,7 +35,7 @@ export default defineComponent({
     },
     components: {
         ElIcon,
-        BottomLeft, FullScreen, Refresh, Close
+        BottomLeft, FullScreen, Refresh, Close, MoreFilled
     },
 })
 </script>
@@ -39,8 +43,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 .custom-button {
     position: relative;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border: solid 1px #dde4eb;
     border-radius: 5px;
     color: #9094a1;

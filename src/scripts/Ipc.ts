@@ -16,9 +16,9 @@ const sendIpcLOG = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => 
 }
 
 /**
- * @description nav-bar 上的 最小、最大、关闭 按钮
+ * @description nav-bar 上的按钮: 最小、最大、关闭、打开github页面
  */
-const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
+const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE' | 'GITHUB') => {
     ipcRenderer.send('NAV', args)
 }
 

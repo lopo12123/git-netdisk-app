@@ -1,0 +1,10 @@
+// 下拉菜单的条目 使icon和文字部分能够水平对齐
+.el-dropdown-menu__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .txt {
+        font-size: 12px;
+    }
+}
