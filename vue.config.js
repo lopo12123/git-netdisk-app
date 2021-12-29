@@ -3,11 +3,12 @@ module.exports = {
         electronBuilder: {
             nodeIntegration: true,
 
+            // 打包配置
             // builderOptions: {
-            //     appId: 'app.netdisk.git',
-            //     productName: 'lopo',
+            //     appId: 'com.gitApp.app',
+            //     productName: 'git-it',
             //     win: {
-            //         icon: 'build/icons/ico_256.ico'
+            //         icon: 'public/git.png'
             //     }
             // },
 
