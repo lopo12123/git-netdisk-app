@@ -2,6 +2,7 @@
 
 import {app, protocol, BrowserWindow, ipcMain} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
+const myLog = require('./scripts/ErrorLog').myLog
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -19,7 +20,23 @@ let win: BrowserWindow | null = null
 app.on('ready', async () => {
     await createWindow()
 
-    // nav-bar 上的 最小、最大、关闭 按钮
+    // region [F12] F12打开控制台
+    ipcMain.on('F12', (e, args: null) => {
+        if(!win) return
+
+        if(!win.webContents.isDevToolsOpened()) {
+            win.webContents.openDevTools()
+        }
+    })
+    // endregion
+
+    // region [LOG] 写入日志
+    ipcMain.on('LOG', (e, args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => {
+        myLog(args.type, args.e)
+    })
+    // endregion
+
+    // region [NAV] nav-bar 上的 最小、最大、关闭 按钮
     ipcMain.on('NAV', (e, args: 'MAX' | 'MIN' | 'CLOSE') => {
         if(!win) return
 
@@ -40,6 +57,7 @@ app.on('ready', async () => {
                 break
         }
     })
+    // endregion
 })
 
 // Quit when all windows are closed.
