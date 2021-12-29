@@ -10,7 +10,7 @@
 <script lang="ts">
 import {defineComponent} from "vue";
 import CustomButton, { BtnType } from "@/components/AppNavBar/CustomButton.vue";
-import {sendIpc} from '@/components/AppNavBar/ipc'
+import {sendIpcNav} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: 'AppNavBar',
@@ -21,7 +21,7 @@ export default defineComponent({
         const navBarBtn = (type: BtnType) => {
             if(type === 'REFRESH') window.location.reload()
             else {
-                sendIpc(type)
+                sendIpcNav(type)
             }
         }
 
