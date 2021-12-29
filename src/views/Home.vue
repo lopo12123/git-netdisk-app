@@ -1,13 +1,28 @@
 <template>
     <div class="home">
         home
+        <button @click="testTree">Tree ipc</button>
     </div>
 </template>
 
 <script lang="ts">
-import {Options, Vue} from 'vue-class-component';
+import {defineComponent} from "vue";
+import {sendIpcLOG} from "@/scripts/Ipc";
 
-@Options({})
-export default class Home extends Vue {
-}
+export default defineComponent({
+    name: 'Home',
+    setup() {
+        const testTree = () => {
+            console.log(123)
+            sendIpcLOG({
+                type: 'WARNING',
+                e: '123123123'
+            })
+        }
+
+        return {
+            testTree
+        }
+    }
+})
 </script>
