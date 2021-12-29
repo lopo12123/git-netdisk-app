@@ -10,19 +10,31 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, onBeforeUnmount} from "vue";
 import AppNavBar from "@/views/AppNavBar.vue";
+import {sendIpcF12} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: 'App',
     components: {
         AppNavBar
+    },
+    setup() {
+        const f12 = (e: KeyboardEvent) => {
+            if(e.key === 'F12') sendIpcF12()
+        }
+
+        window.addEventListener('keyup', f12)
+        onBeforeUnmount(() => {
+            window.removeEventListener('keyup', f12)
+        })
+
+        return { f12 }
     }
 })
 </script>
 
 <style lang="scss" scoped>
-
 #app-main-window {
     position: relative;
     width: 100%;
