@@ -70,7 +70,7 @@ export default defineComponent({
                     router.push({name: 'Setting'})
                     break
                 case "GITHUB":
-                    sendIpcNav('GITHUB')
+                    // sendIpcNav('GITHUB')
                     break
             }
         }
