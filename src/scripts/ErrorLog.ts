@@ -19,8 +19,7 @@ namespace ErrorLog {
     }
 }
 
-const myLog = ErrorLog.myLog
-
+// const myLog = ErrorLog.myLog
 module.exports = {
-    myLog
+    myLog: ErrorLog.myLog
 }
