@@ -1,5 +1,5 @@
 /// background
-namespace ErrorLog {
+namespace Logger {
     const fs = require('fs');
     const EOL = require('os').EOL;
 
@@ -20,7 +20,7 @@ namespace ErrorLog {
     }
 }
 
-// const myLog = ErrorLog.myLog
+// const myLog = Logger.myLog
 module.exports = {
-    myLog: ErrorLog.myLog
+    myLog: Logger.myLog
 }

@@ -2,7 +2,7 @@
 
 import {app, protocol, BrowserWindow, ipcMain} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
-const myLog = require('./scripts/ErrorLog').myLog
+const myLog = require('./scripts/Logger').myLog
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

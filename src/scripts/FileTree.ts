@@ -4,7 +4,7 @@ namespace FileTree {
     const fs = require("fs");
     const path = require("path");
     const uuid = require("uuid").v4;
-    const myLog = require("../scripts/ErrorLog").myLog;
+    const myLog = require("../scripts/Logger").myLog;
 
     // region 接口
     /**
