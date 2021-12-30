@@ -1,3 +1,4 @@
+/// foreground
 import path from "path";
 import {ipcRenderer} from "electron";
 

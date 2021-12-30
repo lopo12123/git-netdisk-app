@@ -1,3 +1,4 @@
+/// background
 /// 其中所有的私有方法都为同步方法(sync), 出错或不满足返回条件则返回值为null
 namespace FileTree {
     const fs = require("fs");
