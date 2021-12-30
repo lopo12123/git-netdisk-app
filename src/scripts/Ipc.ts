@@ -4,6 +4,24 @@ import {ipcRenderer} from "electron";
 
 // region 全局ipc事件
 /**
+ * @description [DISK] 获取系统盘符
+ */
+const sendIpcDisk = (uuid: string): Promise<string[] | null> => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.send('DISK', uuid)
+        ipcRenderer.on('DISK', (ev, args: { uuid: string, disks: string[] | null }) => {
+            if(args.uuid === uuid) {
+                resolve(args.disks)
+            }
+        })
+
+        setTimeout(() => {  // 设置最长等待时间, 超时则不作等待直接返回错误信息
+            reject('TIMEOUT')
+        }, 5_000)
+    })
+}
+
+/**
  * @description [F12] 打开控制台
  */
 const sendIpcF12 = () => {

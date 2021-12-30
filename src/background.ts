@@ -2,7 +2,9 @@
 
 import {app, protocol, BrowserWindow, ipcMain} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
+
 const myLog = require('./scripts/Logger').myLog
+const getDiskName = require('./scripts/DiskName').getDiskName
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -19,6 +21,12 @@ let win: BrowserWindow | null = null
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
     await createWindow()
+
+    // region [DISK] 获取盘符
+    ipcMain.on('DISK', (ev, args: string) => {
+        ev.reply('DISK', { uuid: args, disks: getDiskName() })
+    })
+    // endregion
 
     // region [F12] F12打开控制台
     ipcMain.on('F12', (e, args: null) => {
