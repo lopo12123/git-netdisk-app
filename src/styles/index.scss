@@ -1,3 +1,20 @@
+// 滚动条样式
+@mixin scrollBarStyle($color: #aaaaaa) {
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $color;
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+        background-color: #00000000;
+        border-radius: 10px;
+        opacity: 0;
+    }
+}
+
 // 下拉菜单的条目 使icon和文字部分能够水平对齐
 .el-dropdown-menu__item {
     display: flex;
