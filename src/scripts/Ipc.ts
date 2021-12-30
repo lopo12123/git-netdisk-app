@@ -42,8 +42,14 @@ const sendIpcTest = (args: { depth: number }) => {
 }
 
 export {
+    // 全局
     sendIpcF12,
-    sendIpcNav,
     sendIpcLOG,
+    sendIpcUrl,
+
+    // 组件
+    sendIpcNav,
+
+    // 测试 TODO 删除
     sendIpcTest
 }
