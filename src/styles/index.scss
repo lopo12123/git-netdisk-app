@@ -15,6 +15,17 @@
     }
 }
 
+// 消息提示框样式
+.el-message {
+    width: fit-content;
+    min-width: 100px;
+    padding: 5px 10px;
+
+    .el-message__content {
+        font-size: 12px;
+    }
+}
+
 // 下拉菜单的条目 使icon和文字部分能够水平对齐
 .el-dropdown-menu__item {
     display: flex;
