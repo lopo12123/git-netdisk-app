@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount, ref} from "vue";
+import {defineComponent, onBeforeUnmount} from "vue";
 import AppNavBar from "@/views/AppNavBar.vue";
 import {sendIpcF12} from "@/scripts/Ipc";
 
