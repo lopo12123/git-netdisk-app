@@ -12,7 +12,9 @@
 <script lang="ts">
 import {defineComponent, onBeforeUnmount} from "vue";
 import AppNavBar from "@/views/AppNavBar.vue";
-import {sendIpcF12} from "@/scripts/Ipc";
+// @ts-ignore
+import {v4 as uuid} from "uuid";
+import {sendIpcDisk, sendIpcF12} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: 'App',
@@ -20,16 +22,29 @@ export default defineComponent({
         AppNavBar
     },
     setup() {
+        // region 注册F12快捷键监听及其注销(唤起控制台)
         const f12 = (e: KeyboardEvent) => {
             if(e.key === 'F12') sendIpcF12()
         }
-
         window.addEventListener('keyup', f12)
         onBeforeUnmount(() => {
             window.removeEventListener('keyup', f12)
         })
+        // endregion
 
-        return { f12 }
+        // 获取盘符
+        // sendIpcDisk(uuid())
+        //     .then((diskArr) => {
+        //         if(diskArr !== null) {
+        //             console.log('disks: ', diskArr)
+        //         }
+        //         else {
+        //             // 未获取到盘符
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         console.log(err)
+        //     })
     }
 })
 </script>
