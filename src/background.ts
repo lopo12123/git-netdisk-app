@@ -4,7 +4,7 @@ import {app, protocol, BrowserWindow, ipcMain} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 
 const myLog = require('./scripts/Logger').myLog
-const getDiskName = require('./scripts/DiskName').getDiskName
+const getDiskInfo = require('./scripts/DiskInfo').getDiskInfo
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -24,7 +24,7 @@ app.on('ready', async () => {
 
     // region [DISK] 获取盘符
     ipcMain.on('DISK', (ev, args: string) => {
-        ev.reply('DISK', { uuid: args, disks: getDiskName() })
+        ev.reply('DISK', { uuid: args, disks: getDiskInfo() })
     })
     // endregion
 
