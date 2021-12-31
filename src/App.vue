@@ -4,17 +4,17 @@
             <app-nav-bar></app-nav-bar>
         </div>
         <div id="app-main-window-view-port">
-            <router-view/>
+            <router-view v-loading="ifLoading" element-loading-text="scanning disk names"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount} from "vue";
+import {defineComponent, onBeforeUnmount, ref} from "vue";
 import AppNavBar from "@/views/AppNavBar.vue";
-// @ts-ignore
 import {v4 as uuid} from "uuid";
 import {sendIpcDisk, sendIpcF12} from "@/scripts/Ipc";
+import {ElMessage} from "element-plus";
 
 export default defineComponent({
     name: 'App',
@@ -32,19 +32,40 @@ export default defineComponent({
         })
         // endregion
 
-        // 获取盘符
-        // sendIpcDisk(uuid())
-        //     .then((diskArr) => {
-        //         if(diskArr !== null) {
-        //             console.log('disks: ', diskArr)
-        //         }
-        //         else {
-        //             // 未获取到盘符
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.log(err)
-        //     })
+        // region 获取盘符
+        const ifLoading = ref(false)
+        ifLoading.value = true
+        sendIpcDisk(uuid())
+            .then((diskArr) => {
+                ifLoading.value = false
+                if(diskArr !== null) {
+                    ElMessage({
+                        type: 'info',
+                        message: `disks on this computer: ["${diskArr.join('", "')}"]`
+                    })
+                }
+                else {
+                    // 未获取到盘符
+                    ElMessage({
+                        type: 'warning',
+                        message: 'can`t get disk list on this computer'
+                    })
+                }
+            })
+            .catch((err) => {
+                ifLoading.value = false
+                ElMessage({
+                    type: 'error',
+                    message: err === 'TIMEOUT'
+                        ? 'timeout parsing file tree'
+                        : 'some problem occurs when getting disk list on this machine'
+                })
+            })
+        // endregion
+
+        return {
+            ifLoading
+        }
     }
 })
 </script>
