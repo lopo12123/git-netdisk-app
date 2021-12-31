@@ -116,10 +116,10 @@ if (isDevelopment) {
 async function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 400,
-        height: 300,
-        minWidth: 400,
-        minHeight: 300,
+        width: 800,
+        height: 600,
+        minWidth: 800,
+        minHeight: 600,
         frame: false,
         backgroundColor: '#fcfcfc',
         webPreferences: {
