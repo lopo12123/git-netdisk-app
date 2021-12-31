@@ -1,60 +1,111 @@
 <template>
-    <div id="home">
+    <div id="home" v-loading="ifLoading" element-loading-text="scanning disk names">
         <div class="info-box">Select A Folder To Get Start</div>
-        <div class="file-box">
-            <file-selector v-loading="ifLoading"
-                           @box-event="boxEvent"/>
+        <div class="disk-box">
+            <el-card class="disk-item" shadow="hover"
+                     v-for="(item, index) in diskNameList" :key="index">
+                <div class="caption">
+                    <span class="key">DISK NAME</span>
+                    <span class="value">{{ item.caption }}</span>
+                </div>
+                <div class="number">
+                    <span class="key">USED/TOTAL</span>
+                    <span class="value">
+                        {{ getPercentage(item.freeSize, item.totalSize, 'text') }}
+                    </span>
+                </div>
+                <div class="bar">
+                    <el-progress
+                        :text-inside="true"
+                        :stroke-width="18"
+                        :status="getPercentageType(item.freeSize, item.totalSize)"
+                        :percentage="getPercentage(item.freeSize, item.totalSize, 'number')"/>
+                </div>
+            </el-card>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
-import {ElMessage} from "element-plus";
+import {computed, defineComponent, ref} from "vue";
+import {useStore} from "vuex";
+import {ElMessage, ElCard, ElProgress} from "element-plus";
 import {v4 as uuid} from "uuid";
-import FileSelector from "@/components/Home/FileSelector.vue";
-import {sendIpcHome} from "@/scripts/Ipc";
+import {sendIpcDisk} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: 'Home',
     components: {
-        FileSelector
+        ElCard, ElProgress
     },
     setup() {
-        const ifLoading = ref(false)
-        const boxEvent = (args: {type: 'click', path: null} | {type: 'drop', path: string}) => {
-            // 点击 - 后台调用资源管理器打开选择路径(不限时)
-            // 拖拽 - 传送路径到后台并解析文件树(设置超时时间)
-            sendIpcHome({uuid: uuid(), path: args.path})
-                .then(({tree}) => {  // 后台解析树后返回
-                    if(tree === null) {
+        const store = useStore();
+        const ifLoading = ref(true)
+
+        // region 获取磁盘盘符列表(进入后自动执行一次, 若失败可再次手动调用)
+        const tryGetDiskNameList = () => {
+            sendIpcDisk(uuid())
+                .then((diskArr) => {
+                    ifLoading.value = false
+                    if(diskArr !== null) {  // 获取到了盘符
+                        store.commit('diskModule/updateNameList', diskArr)
                         ElMessage({
-                            type: 'warning',
-                            message: 'some problem occurred when parsing file tree'
+                            type: 'success',
+                            message: 'finish scanning disks on this computer'
                         })
                     }
-                    else {
-                        console.log('成功解析文件树: ', tree)
+                    else {  // 未获取到盘符
+                        ElMessage({
+                            type: 'warning',
+                            message: 'can`t get disk name list on this computer'
+                        })
                     }
                 })
                 .catch((err) => {
-                    console.log(err)
+                    ifLoading.value = false
                     ElMessage({
-                        type: 'warning',
-                        message: '111'
+                        type: 'error',
+                        message: err === 'TIMEOUT'
+                            ? 'timeout in scanning disks on this computer'
+                            : 'some problem occurs when getting disk list on this machine'
                     })
                 })
         }
+        tryGetDiskNameList()
+        // endregion
+
+        // region 处理展示卡片数据相关的函数
+        const getPercentage = (freeBit: number, totalBit: number, type: 'number' | 'text') => {
+            if(type === 'number') {
+                return parseFloat(((totalBit - freeBit) / totalBit * 100).toFixed(2))
+            }
+            else {
+                return (`
+                    ${((totalBit-freeBit)/1024/1024/1024).toFixed(2)}GB
+                    / ${(totalBit/1024/1024/1024).toFixed(2)}GB
+                `)
+            }
+        }
+        const getPercentageType = (freeBit: number, totalBit: number) => {
+            const p = getPercentage(freeBit, totalBit, 'number') as number
+            if(p <= 50) return 'success'
+            else if(p <= 80) return 'warning'
+            else return 'exception'
+        }
+        // endregion
 
         return {
             ifLoading,
-            boxEvent
+            diskNameList: computed(() => store.state.diskModule.diskNameList),
+            getPercentage, getPercentageType
         }
     }
 })
 </script>
 
 <style lang="scss" scoped>
+@import "../styles/index";
+
 #home {
     position: relative;
     width: 100%;
@@ -65,18 +116,51 @@ export default defineComponent({
         position: relative;
         width: calc(100% - 60px);
         height: 40px;
-        margin: 10px 30px;
+        margin: 20px 30px 0;
         color: #cccccc;
-        font-size: 14px;
+        font-size: 16px;
         line-height: 40px;
         text-align: center;
         user-select: none;
     }
 
-    .file-box {
+    .disk-box {
+        @include scrollBarStyle();
         width: calc(100% - 60px);
-        height: calc(100% - 80px);
-        margin: 0 30px 20px;
+        height: calc(100% - 100px);
+        margin: 0 30px 40px;
+        overflow-y: auto;
+
+        .disk-item {
+            position: relative;
+            margin: 10px 0;
+            cursor: pointer;
+            user-select: none;
+
+            .caption {
+                position: relative;
+                width: 20%;
+                display: inline-block;
+            }
+            .number {
+                position: relative;
+                width: 40%;
+                display: inline-block;
+            }
+            .bar {
+                position: relative;
+                width: 40%;
+                display: inline-block;
+            }
+            .key {
+                margin-right: 10px;
+                color: #cccccc;
+            }
+            .value {
+                color: #787878;
+                font-weight: bold;
+            }
+        }
     }
 }
 </style>
