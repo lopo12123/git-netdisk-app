@@ -2,17 +2,17 @@
 /// 某些ipc需要回调, 采用promise方式. 传参时需要添加uuid作为消息往返凭证
 import path from "path";
 import {ipcRenderer} from "electron";
-import {FileTreeNode} from "@/scripts/interface";
+import {DiskInfo, FileTreeNode} from "@/scripts/interface";
 
 // region 全局ipc事件
 /**
  * @description [DISK] 获取系统盘符
  */
-const sendIpcDisk = (uuid: string): Promise<string[] | null> => {
+const sendIpcDisk = (uuid: string): Promise<DiskInfo[] | null> => {
     return new Promise((resolve, reject) => {
         let timeoutTimer = true
         ipcRenderer.send('DISK', uuid)
-        ipcRenderer.once('DISK', (ev, args: { uuid: string, disks: string[] | null }) => {
+        ipcRenderer.once('DISK', (ev, args: { uuid: string, disks: DiskInfo[] | null }) => {
             timeoutTimer = false
             if(args.uuid === uuid) {
                 resolve(args.disks)
