@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import {DiskInfo} from "@/scripts/interface";
 
 export default createStore({
     modules: {
@@ -6,10 +7,10 @@ export default createStore({
         diskModule: {
             namespaced: true,
             state: {
-                diskNameList: [] as string[]
+                diskNameList: [] as DiskInfo[]
             },
             mutations: {
-                updateNameList(state: any, newList: string[]) {
+                updateNameList(state: any, newList: DiskInfo[]) {
                     state.diskNameList = newList
                 }
             }
