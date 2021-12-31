@@ -1,4 +1,5 @@
 /// foreground
+/// 某些ipc需要回调, 采用promise方式. 传参时需要添加uuid作为消息往返凭证
 import path from "path";
 import {ipcRenderer} from "electron";
 
@@ -9,12 +10,14 @@ import {ipcRenderer} from "electron";
 const sendIpcDisk = (uuid: string): Promise<string[] | null> => {
     return new Promise((resolve, reject) => {
         ipcRenderer.send('DISK', uuid)
-        ipcRenderer.on('DISK', (ev, args: { uuid: string, disks: string[] | null }) => {
+        ipcRenderer.once('DISK', (ev, args: { uuid: string, disks: string[] | null }) => {
             if(args.uuid === uuid) {
                 resolve(args.disks)
             }
+            else {
+                reject('TIMEOUT')
+            }
         })
-
         setTimeout(() => {  // 设置最长等待时间, 超时则不作等待直接返回错误信息
             reject('TIMEOUT')
         }, 5_000)
@@ -45,20 +48,35 @@ const sendIpcUrl = (args: string) => {
 
 // region 组件内ipc事件
 /**
- * @description nav-bar 上的按钮: 最小、最大、关闭、打开github页面
+ * @description [NAV] [AppNavBar.vue] 按钮: 最小、最大、关闭、打开github页面
  */
 const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
     ipcRenderer.send('NAV', args)
 }
-// endregion
 
 /**
- * @description 测试 TODO 删除
+ * @description [HOME] [Home.vue] 点击选框选择文件/拖拽选择文件夹
  */
-const sendIpcTest = (args: { depth: number }) => {
-    console.log(args)
-    ipcRenderer.send('test', args)
+const sendIpcHome = ({uuid, path}: { uuid: string, path: string | null }) => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.send('HOME', {uuid, path})
+        ipcRenderer.once('HOME', (ev, args) => {
+            if(args.uuid === uuid) {
+                console.log(args)
+                resolve('111')
+            }
+            else {
+                reject('TIMEOUT')
+            }
+        })
+        if(path !== null) {  // 拖拽 - 直接生成文件树 (设置超时)
+            setTimeout(() => {
+                reject('TIMEOUT')
+            }, 5_000)
+        }
+    })
 }
+// endregion
 
 export {
     // 全局
@@ -69,7 +87,5 @@ export {
 
     // 组件
     sendIpcNav,
-
-    // 测试 TODO 删除
-    sendIpcTest
+    sendIpcHome,
 }
