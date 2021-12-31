@@ -1,8 +1,10 @@
 <template>
     <div id="home" v-loading="ifLoading" element-loading-text="scanning disk names">
-        <div class="info-box">Select A Folder To Get Start</div>
+        <div class="info-box">
+            <span v-if="ifSuccess">Select A Folder To Get Start</span>
+        </div>
         <div class="disk-box">
-            <el-card class="disk-item" shadow="hover"
+            <el-card v-if="ifSuccess" class="disk-item" shadow="hover"
                      v-for="(item, index) in diskNameList" :key="index">
                 <div class="caption">
                     <span class="key">DISK NAME</span>
@@ -22,6 +24,13 @@
                         :percentage="getPercentage(item.freeSize, item.totalSize, 'number')"/>
                 </div>
             </el-card>
+            <div v-if="!ifSuccess" class="failed">
+                <img src="../assets/broken.png" alt @click="tryGetDiskNameList" draggable="false">
+                <div class="fail-info">
+                    Some problems occurred while scanning the hard drive. <br>
+                    Click on the face above to try again.
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -41,12 +50,14 @@ export default defineComponent({
     setup() {
         const store = useStore();
         const ifLoading = ref(true)
+        const ifSuccess = ref(false)
 
         // region 获取磁盘盘符列表(进入后自动执行一次, 若失败可再次手动调用)
         const tryGetDiskNameList = () => {
             sendIpcDisk(uuid())
                 .then((diskArr) => {
                     ifLoading.value = false
+                    ifSuccess.value = true
                     if(diskArr !== null) {  // 获取到了盘符
                         store.commit('diskModule/updateNameList', diskArr)
                         ElMessage({
@@ -63,6 +74,7 @@ export default defineComponent({
                 })
                 .catch((err) => {
                     ifLoading.value = false
+                    ifSuccess.value = false
                     ElMessage({
                         type: 'error',
                         message: err === 'TIMEOUT'
@@ -95,7 +107,8 @@ export default defineComponent({
         // endregion
 
         return {
-            ifLoading,
+            tryGetDiskNameList,
+            ifLoading, ifSuccess,
             diskNameList: computed(() => store.state.diskModule.diskNameList),
             getPercentage, getPercentageType
         }
@@ -159,6 +172,41 @@ export default defineComponent({
             .value {
                 color: #787878;
                 font-weight: bold;
+            }
+        }
+
+        .failed {
+            position: relative;
+            width: calc(100% - 60px);
+            height: calc(100% - 100px);
+            margin: 0 30px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            > img {
+                position: relative;
+                width: 128px;
+                height: 128px;
+                border-radius: 64px;
+                cursor: pointer;
+                user-select: none;
+                opacity: 0.7;
+                &:hover {
+                    opacity: 1;
+                }
+                &:active {
+                    opacity: 0.8;
+                }
+            }
+            .fail-info {
+                margin-top: 20px;
+                color: #cccccc;
+                font-size: 16px;
+                line-height: 40px;
+                text-align: center;
+                user-select: none;
             }
         }
     }
