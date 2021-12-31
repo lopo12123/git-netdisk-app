@@ -26,10 +26,19 @@ export default defineComponent({
             // 点击 - 后台调用资源管理器打开选择路径(不限时)
             // 拖拽 - 传送路径到后台并解析文件树(设置超时时间)
             sendIpcHome({uuid: uuid(), path: args.path})
-                .then((res) => {
-                    console.log(res)
+                .then(({tree}) => {  // 后台解析树后返回
+                    if(tree === null) {
+                        ElMessage({
+                            type: 'warning',
+                            message: 'some problem occurred when parsing file tree'
+                        })
+                    }
+                    else {
+                        console.log('成功解析文件树: ', tree)
+                    }
                 })
                 .catch((err) => {
+                    console.log(err)
                     ElMessage({
                         type: 'warning',
                         message: '111'
