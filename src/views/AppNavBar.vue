@@ -1,5 +1,5 @@
 <template>
-    <div class="app-nav-bar">
+    <div id="app-nav-bar">
         <el-dropdown size="small" @command="handleCommand">
             <custom-button btn-type="MORE" @btn-click="navBarBtn" style="margin-left: 10px"></custom-button>
             <template #dropdown>
@@ -86,7 +86,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 $btn-number: 5;
 
-.app-nav-bar {
+#app-nav-bar {
     position: relative;
     width: 100%;
     height: 100%;
