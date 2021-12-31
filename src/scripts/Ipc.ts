@@ -61,6 +61,7 @@ const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
 
 /**
  * @description [HOME] [Home.vue] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
+ * @deprecated 待修改
  */
 const sendIpcHome = ({uuid, path}: { uuid: string, path: string | null }): Promise<{uuid: string, tree: FileTreeNode|null}> => {
     return new Promise((resolve, reject) => {
