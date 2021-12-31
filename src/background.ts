@@ -44,7 +44,11 @@ app.on('ready', async () => {
     })
     // endregion
 
-    // region [NAV] nav-bar 上的 最小、最大、关闭 按钮
+    // region [URL] 打开指定网站
+    // todo
+    // endregion
+
+    // region [NAV] 按钮: 最小、最大、关闭
     ipcMain.on('NAV', (e, args: 'MAX' | 'MIN' | 'CLOSE') => {
         if(!win) return
 
@@ -64,6 +68,15 @@ app.on('ready', async () => {
                 app.exit()
                 break
         }
+    })
+    // endregion
+
+    // region [HOME] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
+    ipcMain.on('HOME', (ev, args: {uuid: string, path: string | null}) => {
+        console.log(args.uuid, args.path)
+        setTimeout(() => {
+            ev.reply('HOME', {uuid: args.uuid, tree: {id: 'root', children: []}})
+        }, 2_000)
     })
     // endregion
 })
