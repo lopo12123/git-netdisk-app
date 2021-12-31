@@ -1,4 +1,13 @@
 /**
+ * @description wmic获取的磁盘信息
+ */
+interface DiskInfo {
+    caption: string  // 盘符
+    freeSize: number  // 剩余空间 bit
+    totalSize: number  // 总空间 bit
+}
+
+/**
  * @description 解析后的文件树
  */
 interface FileTreeNode {
@@ -14,5 +23,6 @@ interface FileTreeNode {
 }
 
 export {
+    DiskInfo,
     FileTreeNode
 }
