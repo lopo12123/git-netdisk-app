@@ -31,7 +31,7 @@ const sendIpcF12 = () => {
 /**
  * @description [LOG] 写入日志
  */
-const sendIpcLOG = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => {
+const sendIpcLog = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => {
     ipcRenderer.send('LOG', args)
 }
 
@@ -62,8 +62,9 @@ const sendIpcTest = (args: { depth: number }) => {
 
 export {
     // 全局
+    sendIpcDisk,
     sendIpcF12,
-    sendIpcLOG,
+    sendIpcLog,
     sendIpcUrl,
 
     // 组件
