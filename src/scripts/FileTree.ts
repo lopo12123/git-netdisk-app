@@ -7,7 +7,7 @@ namespace FileTree {
     const myLog = require("../scripts/Logger").myLog;
 
     // region 接口
-    // @ts-ignore TODO
+    // @ts-ignore
     import {FileTreeNode} from "@/scripts/interface";
     // endregion
 
