@@ -16,9 +16,13 @@
                         <template #icon>
                             <link-outlined/>
                         </template>
-                        <a-menu-item  @click="handleCommand('GITHUB')">
+                        <a-menu-item  @click="handleCommand('AUTHOR')">
                             <github-outlined/>
-                            <span class="txt">On GitHub</span>
+                            <span class="txt">Author</span>
+                        </a-menu-item>
+                        <a-menu-item  @click="handleCommand('PROJECT')">
+                            <github-outlined/>
+                            <span class="txt">Project</span>
                         </a-menu-item>
                         <a-menu-item  @click="handleCommand('LICENSE')">
                             <file-outlined/>
@@ -50,10 +54,10 @@ import {
     FileOutlined
 } from "@ant-design/icons-vue";
 import CustomButton, { BtnType } from "@/components/AppNavBar/CustomButton.vue";
-import {sendIpcNav} from "@/scripts/Ipc";
+import {sendIpcNav, sendIpcUrl} from "@/scripts/Ipc";
 import {useRouter} from "vue-router";
 
-type CmdType = 'HOME' | 'SETTING' | 'GITHUB' | 'LICENSE'
+type CmdType = 'AUTHOR' | 'HOME' | 'LICENSE' | 'PROJECT' | 'SETTING'
 
 export default defineComponent({
     name: 'AppNavBar',
@@ -86,11 +90,14 @@ export default defineComponent({
                 case "SETTING":
                     router.push({name: 'Setting'})
                     break
-                case "GITHUB":
-                    // sendIpcNav('GITHUB')
+                case "PROJECT":
+                    sendIpcUrl('https://baidu.com')
                     break
                 case "LICENSE":
                     router.push({name: 'License'})
+                    break
+                case "AUTHOR":
+                    sendIpcUrl('https://baidu.com')
                     break
             }
         }
