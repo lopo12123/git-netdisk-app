@@ -1,6 +1,6 @@
 'use strict'
 
-import {app, protocol, BrowserWindow, ipcMain} from 'electron'
+import {app, protocol, BrowserWindow, ipcMain, shell} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 
 const myLog = require('./scripts/Logger').myLog
@@ -45,7 +45,9 @@ app.on('ready', async () => {
     // endregion
 
     // region [URL] 打开指定网站
-    // todo
+    ipcMain.on('URL', (e, url: string) => {
+        shell.openExternal(url)
+    })
     // endregion
 
     // region [NAV] 按钮: 最小、最大、关闭
