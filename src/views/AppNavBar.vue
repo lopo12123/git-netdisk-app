@@ -1,24 +1,33 @@
 <template>
     <div id="app-nav-bar">
-        <el-dropdown size="small" @command="handleCommand">
+        <a-dropdown>
             <custom-button btn-type="MORE" @btn-click="navBarBtn" style="margin-left: 10px"></custom-button>
-            <template #dropdown>
-                <el-dropdown-menu>
-                    <el-dropdown-item command="HOME">
-                        <el-icon size="14"><house/></el-icon>
-                        <span class="txt">Home</span>
-                    </el-dropdown-item>
-                    <el-dropdown-item command="SETTING">
-                        <el-icon size="14"><setting/></el-icon>
+            <template #overlay>
+                <a-menu>
+                    <a-menu-item @click="handleCommand('HOME')">
+                        <home-outlined/>
+                        <span class="txt">Back To Home</span>
+                    </a-menu-item>
+                    <a-menu-item @click="handleCommand('SETTING')">
+                        <setting-outlined/>
                         <span class="txt">Setting</span>
-                    </el-dropdown-item>
-                    <el-dropdown-item command="GITHUB">
-                        <el-icon size="14"><Link/></el-icon>
-                        <span class="txt">GitHub</span>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
+                    </a-menu-item>
+                    <a-sub-menu title="View More">
+                        <template #icon>
+                            <link-outlined/>
+                        </template>
+                        <a-menu-item  @click="handleCommand('GITHUB')">
+                            <github-outlined/>
+                            <span class="txt">On GitHub</span>
+                        </a-menu-item>
+                        <a-menu-item  @click="handleCommand('LICENSE')">
+                            <file-outlined/>
+                            <span class="txt">LICENSE</span>
+                        </a-menu-item>
+                    </a-sub-menu>
+                </a-menu>
             </template>
-        </el-dropdown>
+        </a-dropdown>
 
         <div class="placeholder"></div>
 
@@ -31,20 +40,28 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import {ElDropdown, ElDropdownMenu, ElDropdownItem, ElIcon} from "element-plus";
-import {Setting, House, Link} from '@element-plus/icons'
+import {ElDropdown, ElDropdownMenu, ElDropdownItem} from "element-plus";
+import {Dropdown, Menu, SubMenu, MenuItem} from 'ant-design-vue';
+import {
+    HomeOutlined,
+    SettingOutlined,
+    LinkOutlined,
+    GithubOutlined,
+    FileOutlined
+} from "@ant-design/icons-vue";
 import CustomButton, { BtnType } from "@/components/AppNavBar/CustomButton.vue";
 import {sendIpcNav} from "@/scripts/Ipc";
 import {useRouter} from "vue-router";
 
-type CmdType = 'HOME' | 'SETTING' | 'GITHUB'
+type CmdType = 'HOME' | 'SETTING' | 'GITHUB' | 'LICENSE'
 
 export default defineComponent({
     name: 'AppNavBar',
     components: {
         ElDropdown, ElDropdownMenu, ElDropdownItem,
+        ADropdown: Dropdown, AMenu: Menu, ASubMenu: SubMenu, AMenuItem: MenuItem,
         CustomButton,
-        ElIcon, Setting, House, Link
+        HomeOutlined, SettingOutlined, LinkOutlined, GithubOutlined, FileOutlined
     },
     setup() {
         const router = useRouter()
@@ -71,6 +88,9 @@ export default defineComponent({
                     break
                 case "GITHUB":
                     // sendIpcNav('GITHUB')
+                    break
+                case "LICENSE":
+                    router.push({name: 'License'})
                     break
             }
         }
