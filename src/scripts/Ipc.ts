@@ -46,8 +46,8 @@ const sendIpcLog = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => 
 /**
  * @description [URL] 打开指定url
  */
-const sendIpcUrl = (args: string) => {
-    ipcRenderer.send('URL', args)
+const sendIpcUrl = (url: string) => {
+    ipcRenderer.send('URL', url)
 }
 // endregion
 
