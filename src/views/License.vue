@@ -18,7 +18,7 @@
             <template #overlay>
                 <a-menu>
                     <a-menu-item @click="copy">Copy The License</a-menu-item>
-                    <a-menu-item>More About <i>MIT</i></a-menu-item>
+                    <a-menu-item @click="mit">More About <i>MIT</i></a-menu-item>
                 </a-menu>
             </template>
         </a-dropdown>
@@ -28,7 +28,8 @@
 <script lang="ts">
 import {defineComponent, Ref, ref} from "vue";
 import {ElMessage} from "element-plus";
-import {Dropdown, Menu, SubMenu, MenuItem} from 'ant-design-vue';
+import {Dropdown, Menu, MenuItem} from 'ant-design-vue';
+import {sendIpcUrl} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: "License",
@@ -61,10 +62,13 @@ export default defineComponent({
                 })
             }
         }
+        const mit = () => {
+            sendIpcUrl('https://spdx.org/licenses/MIT')
+        }
 
         return {
             title, copyright, context_p1, context_p2, context_p3,
-            toCopy, copy,
+            toCopy, copy, mit
         }
     }
 })
