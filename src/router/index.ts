@@ -14,6 +14,11 @@ const routes: Array<RouteRecordRaw> = [
         component: Home
     },
     {
+        path: '/license',
+        name: 'License',
+        component: () => import('@/views/License.vue')
+    },
+    {
         path: '/Setting',
         name: 'Setting',
         component: () => import('@/views/Setting.vue')
