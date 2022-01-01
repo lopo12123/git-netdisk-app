@@ -62,7 +62,7 @@ export default defineComponent({
                         store.commit('diskModule/updateNameList', diskArr)
                         ElMessage({
                             type: 'success',
-                            message: 'finish scanning disks on this computer'
+                            message: 'succeed in scanning disks on this computer'
                         })
                     }
                     else {  // 未获取到盘符
