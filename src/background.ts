@@ -20,8 +20,6 @@ let win: BrowserWindow | null = null
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-    await createWindow()
-
     // region [DISK] 获取盘符
     ipcMain.on('DISK', (ev, args: string) => {
         ev.reply('DISK', { uuid: args, disks: getDiskInfo() })
@@ -80,6 +78,10 @@ app.on('ready', async () => {
             ev.reply('HOME', {uuid: args.uuid, tree: {id: 'root', children: []}})
         }, 2_000)
     })
+    // endregion
+
+    // region create the app
+    await createWindow()
     // endregion
 })
 
