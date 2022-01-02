@@ -1,13 +1,13 @@
 <template>
     <div id="home" v-loading="ifLoading" element-loading-text="scanning disk names">
         <div class="info-box">
-            <span v-if="ifSuccess">Select A Folder To Get Start</span>
+            <span v-if="ifSuccess">Select A Disk To Get Start</span>
         </div>
         <div class="disk-box">
             <el-card v-if="ifSuccess" class="disk-item" shadow="hover"
                      v-for="(item, index) in diskNameList" :key="index">
                 <div class="caption">
-                    <span class="key">DISK NAME</span>
+                    <span class="key">DISK</span>
                     <span class="value">{{ item.caption }}</span>
                 </div>
                 <div class="number">
@@ -152,7 +152,7 @@ export default defineComponent({
 
             .caption {
                 position: relative;
-                width: 20%;
+                width: 15%;
                 display: inline-block;
             }
             .number {
@@ -162,7 +162,7 @@ export default defineComponent({
             }
             .bar {
                 position: relative;
-                width: 40%;
+                width: 45%;
                 display: inline-block;
             }
             .key {
