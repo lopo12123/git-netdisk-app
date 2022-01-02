@@ -1,10 +1,36 @@
 /// background
 /// 其中所有的私有方法都为同步方法(sync), 出错或不满足返回条件则返回值为null
+// import {FileTreeNode} from "@/scripts/interface";
+/**
+ * @description 解析后的文件树
+ */
+interface FileTreeNode {
+    // 节点的id - 可用作表格的row-key
+    uuid: string
+    // 目录/文件
+    type: 'DIR' | 'FILE'
+    // 根目录/磁盘名
+    root: string
+    // 文件名+扩展名
+    base: string
+    // 文件名
+    name: string
+    // 扩展名
+    ext: string
+    // 绝对路径
+    dir: string
+    // 是否获取了子目录信息
+    ifDeep: boolean
+    // 子目录
+    children?: FileTreeNode[]
+}
+
 namespace FileTree {
     const fs = require("fs");
     const path = require("path");
     const uuid = require("uuid").v4;
-    const myLog = require("../scripts/Logger").myLog;
+    const myLog = require("./Logger").myLog;
+    const dfs = require('lopo-lib').dfs
 
     // region 接口
     // @ts-ignore
@@ -20,37 +46,52 @@ namespace FileTree {
         /**
          * @description 文件树对象
          */
-        tree: FileTreeNode | null = null
+        tree: FileTreeNode = {} as FileTreeNode
+
+        /**
+         * @description 是否已经初始化
+         */
+        ifInit: boolean = false
 
         /**
          * @description 传入路径, 以此为根构建文件树类
          */
-        constructor(dir: string[], depth: number = 1) {
-            this.tree = getDirTree(dir, depth)
+        init(rootPath: string): boolean {
+            if(Object.keys(this.tree).length !== 0) return false
+            else {
+                let tree = getDirTree([rootPath])
+                if(tree === null) return false
+                else {
+                    this.tree = tree
+                    this.ifInit = true
+                    return true
+                }
+            }
         }
 
         /**
          * @description 传入当前树的某个节点的uuid, 尝试展开1层其子树
          * @deprecated
          */
-        expand(nodeId: string) {
-            // TODO 发布npm包后引用
-            // 如果树中不存在此nodeId或nodeId对应节点类型为'FILE' => 返回false
-            // 展开子树: 成功 => true; 失败 => false
-        }
-
-        /**
-         * @description 重新构建文件树(刷新)
-         */
-        rebuild(dir: string[], depth: number = 1) {
-            this.tree = getDirTree(dir, depth)
+        expand(nodeId: string): boolean {
+            if(Object.keys(this.tree).length === 0) return false
+            else {
+                const rootPath = dfs(this.tree, null, 'children', (node: FileTreeNode) => {return node.dir})
+                const tree =  getDirTree([rootPath])
+                if(tree === null) return false
+                else {
+                    console.log(tree)
+                    return true
+                }
+            }
         }
 
         /**
          * @description 清空树(触发gc)
          */
         clear() {
-            this.tree = null
+            this.tree = {} as FileTreeNode
+            this.ifInit = false
         }
     }
     // endregion
