@@ -22,6 +22,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/Setting',
         name: 'Setting',
         component: () => import('@/views/Setting.vue')
+    },
+    {
+        path: '/Tree',
+        name: 'Tree',
+        component: () => import('@/views/Tree.vue')
     }
 ]
 
