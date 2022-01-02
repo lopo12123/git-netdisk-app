@@ -5,6 +5,7 @@ import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 
 const myLog = require('./scripts/Logger').myLog
 const getDiskInfo = require('./scripts/DiskInfo').getDiskInfo
+const TreeClass = require('./scripts/FileTree').TreeClass
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -20,6 +21,10 @@ let win: BrowserWindow | null = null
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+    // region 构建对象存储文件树
+    const fileTreeStore = new TreeClass()
+    // endregion
+
     // region [DISK] 获取盘符
     ipcMain.on('DISK', (ev, args: string) => {
         ev.reply('DISK', { uuid: args, disks: getDiskInfo() })
@@ -48,6 +53,24 @@ app.on('ready', async () => {
     })
     // endregion
 
+    // region [Tree] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
+    ipcMain.on('Tree', (ev, args: {uuid: string, path: string, nodeId: string}) => {
+        if(!fileTreeStore.ifInit) {
+            const _result = fileTreeStore.init(args.path)
+            ev.reply('Tree', {uuid: args.uuid, tree: fileTreeStore.tree, result: _result})
+        }
+        else {
+            fileTreeStore.clear()
+            const _result = fileTreeStore.init(args.path)
+            ev.reply('Tree', {uuid: args.uuid, tree: fileTreeStore.tree, result: _result})
+        }
+        console.log(args.uuid, args.path)
+        // setTimeout(() => {
+        //     ev.reply('Tree', {uuid: args.uuid, tree: {id: 'root', children: []}})
+        // }, 2_000)
+    })
+    // endregion
+
     // region [NAV] 按钮: 最小、最大、关闭
     ipcMain.on('NAV', (e, args: 'MAX' | 'MIN' | 'CLOSE') => {
         if(!win) return
@@ -71,14 +94,6 @@ app.on('ready', async () => {
     })
     // endregion
 
-    // region [HOME] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
-    ipcMain.on('HOME', (ev, args: {uuid: string, path: string | null}) => {
-        console.log(args.uuid, args.path)
-        setTimeout(() => {
-            ev.reply('HOME', {uuid: args.uuid, tree: {id: 'root', children: []}})
-        }, 2_000)
-    })
-    // endregion
 
     // region create the app
     await createWindow()
