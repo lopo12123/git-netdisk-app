@@ -21,12 +21,12 @@
                             <span class="txt">Author</span>
                         </a-menu-item>
                         <a-menu-item  @click="handleCommand('PROJECT')">
-                            <github-outlined/>
+                            <folder-open-outlined/>
                             <span class="txt">Project</span>
                         </a-menu-item>
                         <a-menu-item  @click="handleCommand('LICENSE')">
                             <file-outlined/>
-                            <span class="txt">LICENSE</span>
+                            <span class="txt">License</span>
                         </a-menu-item>
                     </a-sub-menu>
                 </a-menu>
@@ -51,6 +51,7 @@ import {
     SettingOutlined,
     LinkOutlined,
     GithubOutlined,
+    FolderOpenOutlined,
     FileOutlined
 } from "@ant-design/icons-vue";
 import CustomButton, { BtnType } from "@/components/AppNavBar/CustomButton.vue";
@@ -65,7 +66,7 @@ export default defineComponent({
         ElDropdown, ElDropdownMenu, ElDropdownItem,
         ADropdown: Dropdown, AMenu: Menu, ASubMenu: SubMenu, AMenuItem: MenuItem,
         CustomButton,
-        HomeOutlined, SettingOutlined, LinkOutlined, GithubOutlined, FileOutlined
+        HomeOutlined, SettingOutlined, LinkOutlined, GithubOutlined, FolderOpenOutlined, FileOutlined
     },
     setup() {
         const router = useRouter()
@@ -91,13 +92,13 @@ export default defineComponent({
                     router.push({name: 'Setting'})
                     break
                 case "PROJECT":
-                    sendIpcUrl('https://baidu.com')
+                    sendIpcUrl('https://github.com/lopo12123/git-netdisk-app')
                     break
                 case "LICENSE":
                     router.push({name: 'License'})
                     break
                 case "AUTHOR":
-                    sendIpcUrl('https://baidu.com')
+                    sendIpcUrl('https://github.com/lopo12123')
                     break
             }
         }
