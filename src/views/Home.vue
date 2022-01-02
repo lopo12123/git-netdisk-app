@@ -5,7 +5,8 @@
         </div>
         <div class="disk-box">
             <el-card v-if="ifSuccess" class="disk-item" shadow="hover"
-                     v-for="(item, index) in diskNameList" :key="index">
+                     v-for="(item, index) in diskNameList" :key="index"
+                     @click="diskClick(item.caption)">
                 <div class="caption">
                     <span class="key">DISK</span>
                     <span class="value">{{ item.caption }}</span>
@@ -40,7 +41,8 @@ import {computed, defineComponent, ref} from "vue";
 import {useStore} from "vuex";
 import {ElMessage, ElCard, ElProgress} from "element-plus";
 import {v4 as uuid} from "uuid";
-import {sendIpcDisk} from "@/scripts/Ipc";
+import {sendIpcDisk, sendIpcTree} from "@/scripts/Ipc";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
     name: 'Home',
@@ -48,7 +50,8 @@ export default defineComponent({
         ElCard, ElProgress
     },
     setup() {
-        const store = useStore();
+        const store = useStore()
+        const router = useRouter()
         const ifLoading = ref(true)
         const ifSuccess = ref(false)
 
@@ -106,11 +109,36 @@ export default defineComponent({
         }
         // endregion
 
+        // region 点击磁盘进入下一页(初始化文件树)
+        const diskClick = (diskName: string) => {
+            sendIpcTree({uuid: uuid(), path: diskName+'/', nodeId: '111111'})
+                .then((res) => {
+                    if(!res.result) {
+                        ElMessage({
+                            type: 'warning',
+                            message: 'some problem occurred when init the file tree'
+                        })
+                    }
+                    else {
+                        sessionStorage.setItem('tree', JSON.stringify(res.tree))
+                        router.push({name: 'Tree'})
+                    }
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'warning',
+                        message: 'some problem occurred when init the file tree'
+                    })
+                })
+        }
+        // endregion
+
         return {
             tryGetDiskNameList,
             ifLoading, ifSuccess,
             diskNameList: computed(() => store.state.diskModule.diskNameList),
-            getPercentage, getPercentageType
+            getPercentage, getPercentageType,
+            diskClick
         }
     }
 })
