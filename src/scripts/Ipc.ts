@@ -49,25 +49,15 @@ const sendIpcLog = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => 
 const sendIpcUrl = (url: string) => {
     ipcRenderer.send('URL', url)
 }
-// endregion
-
-// region 组件内ipc事件
-/**
- * @description [NAV] [AppNavBar.vue] 按钮: 最小、最大、关闭
- */
-const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
-    ipcRenderer.send('NAV', args)
-}
 
 /**
- * @description [HOME] [Home.vue] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
- * @deprecated 待修改
+ * @description [Tree] 传入路径 - 解析文件树并返回
  */
-const sendIpcHome = ({uuid, path}: { uuid: string, path: string | null }): Promise<{uuid: string, tree: FileTreeNode|null}> => {
+const sendIpcTree = ({uuid, path, nodeId}: { uuid: string, path: string, nodeId: string }): Promise<{uuid: string, tree: FileTreeNode, result: boolean}> => {
     return new Promise((resolve, reject) => {
         let timeoutTimer = true
-        ipcRenderer.send('HOME', {uuid, path})
-        ipcRenderer.once('HOME', (ev, args) => {
+        ipcRenderer.send('Tree', {uuid, path})
+        ipcRenderer.once('Tree', (ev, args: {uuid: string, tree: FileTreeNode, result: boolean}) => {
             timeoutTimer = false
             if(args.uuid === uuid) {
                 resolve(args)
@@ -76,14 +66,21 @@ const sendIpcHome = ({uuid, path}: { uuid: string, path: string | null }): Promi
                 reject('TIMEOUT')
             }
         })
-        if(path !== null) {  // 拖拽 - 直接生成文件树 (设置超时)
-            setTimeout(() => {
-                if(timeoutTimer) {
-                    reject('TIMEOUT')
-                }
-            }, 5_000)
-        }
+        setTimeout(() => {
+            if(timeoutTimer) {
+                reject('TIMEOUT')
+            }
+        }, 5_000)
     })
+}
+// endregion
+
+// region 组件内ipc事件
+/**
+ * @description [NAV] [AppNavBar.vue] 按钮: 最小、最大、关闭
+ */
+const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
+    ipcRenderer.send('NAV', args)
 }
 // endregion
 
@@ -96,5 +93,5 @@ export {
 
     // 组件
     sendIpcNav,
-    sendIpcHome,
+    sendIpcTree,
 }
