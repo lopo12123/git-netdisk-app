@@ -19,8 +19,6 @@ interface FileTreeNode {
     ext: string
     // 绝对路径
     dir: string
-    // 是否获取了子目录信息
-    ifDeep: boolean
     // 子目录
     children?: FileTreeNode[]
 }
@@ -30,7 +28,22 @@ namespace FileTree {
     const path = require("path");
     const uuid = require("uuid").v4;
     const myLog = require("./Logger").myLog;
-    const dfs = require('lopo-lib').dfs
+    const {dfs, clone, append} = require('lopo-lib')
+
+    // 系统文件 默认忽略掉
+    const ignoreList = [
+        '$recycle.bin',
+        'system volume information',
+        '$recycle.bin',
+        '$windows.~bt',
+        '$windows.~ws',
+        '$winreagent',
+        'documents and settings',
+        'dumpstack.log.tmp',
+        'hiberfil.sys',
+        'pagefile.sys',
+        'swapfile.sys'
+    ]
 
     // region 接口
     // @ts-ignore
@@ -56,15 +69,19 @@ namespace FileTree {
         /**
          * @description 传入路径, 以此为根构建文件树类
          */
-        init(rootPath: string): boolean {
-            if(Object.keys(this.tree).length !== 0) return false
+        init(rootPath: string): [boolean, string] {
+            if(Object.keys(this.tree).length !== 0) {
+                return [false, "please call 'clear' before 'init'"]
+            }
             else {
                 let tree = getDirTree([rootPath])
-                if(tree === null) return false
+                if(tree === null) {
+                    return [false, 'wrong path of tree`s root']
+                }
                 else {
                     this.tree = tree
                     this.ifInit = true
-                    return true
+                    return [true, 'success']
                 }
             }
         }
@@ -73,16 +90,32 @@ namespace FileTree {
          * @description 传入当前树的某个节点的uuid, 尝试展开1层其子树
          * @deprecated
          */
-        expand(nodeId: string): boolean {
-            if(Object.keys(this.tree).length === 0) return false
+        expand(nodeId: string): [boolean, string] {
+            if(Object.keys(this.tree).length === 0) {
+                return [false, "please call 'clear' before 'init'"]
+            }
             else {
-                const rootPath = dfs(this.tree, null, 'children', (node: FileTreeNode) => {return node.dir})
-                const tree =  getDirTree([rootPath])
-                if(tree === null) return false
-                else {
-                    console.log(tree)
-                    return true
-                }
+                // 搜索子树根节点 - 获取其路径
+                const childTreeRootNode = dfs( clone(this.tree), (node: FileTreeNode) => { return node.uuid === nodeId })
+                // 子树根节点未找到 - 返回
+                if(childTreeRootNode === null) { return [false, 'no such node on the tree'] }
+                // 生成子树
+                const childTree =  getDirTree([childTreeRootNode.dir, childTreeRootNode.base])
+                // 子树为空
+                if(childTree === null) { return [false, 'no such tree'] }
+                // 子树的子节点为空(即当前文件夹为空)
+                if(!childTree.children || childTree.children.length === 0) { return [true, 'the directory is empty'] }
+                // 子树附加到总文件树
+                const appendResult = append(
+                    this.tree,
+                    (node: FileTreeNode) => { return node.uuid === nodeId },
+                    childTree.children, null, true
+                )
+                // 返回结果
+                return [
+                    appendResult,
+                    appendResult ? 'success' : 'error occurred when append child tree'
+                ]
             }
         }
 
@@ -120,7 +153,6 @@ namespace FileTree {
                 _thisNode.children = []  // 当前节点为文件夹则添加children字段
                 if(depth <= 0 || current < depth) {  // 当前深度小于目标深度(或depth值小于等于0)则继续深入
                     current += 1  // 更深入1层
-                    _thisNode.ifDeep = true  // 标记为已经获取子目录信息
                     const _childList = _getChildFileList(...dir)  // 获取子文件名列表, 用于拼接子文件的文件路径
                     if(_childList !== null) {  // 一般获取子目录不会出错 =_=!
                         for(let i = 0 ; i < _childList.length; i ++) {
@@ -144,12 +176,20 @@ namespace FileTree {
     const _getChildFileList = (...dir: string[]): string[] | null => {
         try {
             const _dir: string = path.resolve(...dir)
-            return fs.readdirSync(_dir)
+            return _ChildFileListFilter(fs.readdirSync(_dir))
         }
         catch (e) {
             myLog('ERROR', e.toString())
             return null
         }
+    }
+    /**
+     * @description 获取目标目录的子文件时过滤掉一些系统文件
+     */
+    const _ChildFileListFilter = (oriList: string[]): string[] => {
+        return oriList.filter((item) => {
+            return !ignoreList.includes(item.toLowerCase())
+        })
     }
 
     /**
@@ -168,7 +208,6 @@ namespace FileTree {
                     uuid: uuid(),
                     type: _type,
                     ..._parsedPath,
-                    ifDeep: false  // 默认都是未获取子目录信息
                 }
             }
         }
