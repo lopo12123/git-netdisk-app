@@ -3,6 +3,7 @@
 import {app, protocol, BrowserWindow, ipcMain, shell} from 'electron'
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib'
 
+const exec = require('child_process').exec
 const myLog = require('./scripts/Logger').myLog
 const getDiskInfo = require('./scripts/DiskInfo').getDiskInfo
 const TreeClass = require('./scripts/FileTree').TreeClass
@@ -53,24 +54,6 @@ app.on('ready', async () => {
     })
     // endregion
 
-    // region [Tree] 点击选框选择文件/拖拽选择文件夹 - 解析文件树并返回
-    ipcMain.on('Tree', (ev, args: {uuid: string, path: string, nodeId: string}) => {
-        if(!fileTreeStore.ifInit) {
-            const _result = fileTreeStore.init(args.path)
-            ev.reply('Tree', {uuid: args.uuid, tree: fileTreeStore.tree, result: _result})
-        }
-        else {
-            fileTreeStore.clear()
-            const _result = fileTreeStore.init(args.path)
-            ev.reply('Tree', {uuid: args.uuid, tree: fileTreeStore.tree, result: _result})
-        }
-        console.log(args.uuid, args.path)
-        // setTimeout(() => {
-        //     ev.reply('Tree', {uuid: args.uuid, tree: {id: 'root', children: []}})
-        // }, 2_000)
-    })
-    // endregion
-
     // region [NAV] 按钮: 最小、最大、关闭
     ipcMain.on('NAV', (e, args: 'MAX' | 'MIN' | 'CLOSE') => {
         if(!win) return
@@ -94,8 +77,33 @@ app.on('ready', async () => {
     })
     // endregion
 
+    // region [Tree] 点击选择文件 - 解析文件子树并返回最新树
+    ipcMain.on('Tree', (ev, args: {type: 'INIT' | 'EXPAND', uuid: string, pathOrNodeId: string}) => {
+        if(args.type === 'INIT') {
+            const [result, reason] = fileTreeStore.init(args.pathOrNodeId)
+            ev.reply('Tree', { result, reason, tree: fileTreeStore.tree, uuid: args.uuid })
+        }
+        else if(args.type === 'EXPAND') {
+            const [result, reason] = fileTreeStore.expand(args.pathOrNodeId)
+            ev.reply('Tree', { result, reason, tree: fileTreeStore.tree, uuid: args.uuid })
+        }
+    })
+    // endregion
 
-    // region create the app
+    // region [Explorer] 在资源管理器中打开目录
+    ipcMain.on('Explorer', (ev, args: { uuid: string, dir: string }) => {
+        exec(`explorer ${args.dir}`, (err: Error | null) => {
+            if(err) {
+                ev.reply('Explorer', { uuid: args.uuid, result: false })
+            }
+            else {
+                ev.reply('Explorer', { uuid: args.uuid, result: true })
+            }
+        })
+    })
+    // endregion
+
+    // region [App] create the app
     await createWindow()
     // endregion
 })
