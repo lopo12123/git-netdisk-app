@@ -49,15 +49,27 @@ const sendIpcLog = (args: { type: 'INFO' | 'WARNING' | 'ERROR', e: string }) => 
 const sendIpcUrl = (url: string) => {
     ipcRenderer.send('URL', url)
 }
+// endregion
+
+// region 组件内ipc事件
+/**
+ * @description [NAV] [AppNavBar.vue] 按钮: 最小、最大、关闭
+ */
+const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
+    ipcRenderer.send('NAV', args)
+}
 
 /**
- * @description [Tree] 传入路径 - 解析文件树并返回
+ * @description [Tree] 初始化文件树或扩展文件树 - 返回最新的文件树
+ * @param type 初始化(INIT) / 扩展(EXPAND)
+ * @param uuid 此次通信的uuid
+ * @param pathOrNodeId 参数(初始化: 传path; 扩展: 传nodeId)
  */
-const sendIpcTree = ({uuid, path, nodeId}: { uuid: string, path: string, nodeId: string }): Promise<{uuid: string, tree: FileTreeNode, result: boolean}> => {
+const sendIpcTree = (type: 'INIT' | 'EXPAND', uuid: string, pathOrNodeId: string): Promise<{ result: boolean, reason: string, tree: FileTreeNode, uuid: string }> => {
     return new Promise((resolve, reject) => {
         let timeoutTimer = true
-        ipcRenderer.send('Tree', {uuid, path})
-        ipcRenderer.once('Tree', (ev, args: {uuid: string, tree: FileTreeNode, result: boolean}) => {
+        ipcRenderer.send('Tree', { type, uuid, pathOrNodeId })
+        ipcRenderer.once('Tree', (ev, args: { result: boolean, reason: string, tree: FileTreeNode, uuid: string }) => {
             timeoutTimer = false
             if(args.uuid === uuid) {
                 resolve(args)
@@ -73,14 +85,14 @@ const sendIpcTree = ({uuid, path, nodeId}: { uuid: string, path: string, nodeId:
         }, 5_000)
     })
 }
-// endregion
 
-// region 组件内ipc事件
 /**
- * @description [NAV] [AppNavBar.vue] 按钮: 最小、最大、关闭
+ * @description [Explorer] 在资源管理器中打开目录
+ * @param uuid 通信uuid
+ * @param dir 目标目录
  */
-const sendIpcNav = (args: 'MIN' | 'MAX' | 'CLOSE') => {
-    ipcRenderer.send('NAV', args)
+const sendIpcExplorer = ({uuid, dir}: {uuid: string, dir: string}) => {
+    ipcRenderer.send('Explorer', {uuid, dir})
 }
 // endregion
 
@@ -94,4 +106,5 @@ export {
     // 组件
     sendIpcNav,
     sendIpcTree,
+    sendIpcExplorer,
 }
