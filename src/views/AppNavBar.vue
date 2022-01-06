@@ -77,9 +77,7 @@ export default defineComponent({
                 sendIpcNav(type)
             }
             else if(type === 'REFRESH') window.location.reload()
-            else if(type === 'MORE') {
-                router.push({name: 'Setting'})
-            }
+            else if(type === 'MORE') { /** do nothing */ }
         }
 
         // 下拉菜单按钮
