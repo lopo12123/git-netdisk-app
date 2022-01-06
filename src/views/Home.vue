@@ -111,18 +111,14 @@ export default defineComponent({
 
         // region 点击磁盘进入下一页(初始化文件树)
         const diskClick = (diskName: string) => {
-            sendIpcTree({uuid: uuid(), path: diskName+'/', nodeId: '111111'})
-                .then((res) => {
-                    if(!res.result) {
-                        ElMessage({
-                            type: 'warning',
-                            message: 'some problem occurred when init the file tree'
-                        })
-                    }
-                    else {
-                        sessionStorage.setItem('tree', JSON.stringify(res.tree))
-                        router.push({name: 'Tree'})
-                    }
+            sendIpcTree('INIT', uuid(), diskName+'/')
+                .then((args) => {
+                    sessionStorage.setItem('tree', JSON.stringify(args.tree))
+                    ElMessage({
+                        type: args.result ? 'success' : 'warning',
+                        message: args.reason
+                    })
+                    router.push({name: 'Tree'})
                 })
                 .catch(() => {
                     ElMessage({
