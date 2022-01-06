@@ -42,7 +42,8 @@ namespace FileTree {
         'dumpstack.log.tmp',
         'hiberfil.sys',
         'pagefile.sys',
-        'swapfile.sys'
+        'swapfile.sys',
+        'config.msi'
     ]
 
     // region 接口
@@ -70,6 +71,7 @@ namespace FileTree {
          * @description 传入路径, 以此为根构建文件树类
          */
         init(rootPath: string): [boolean, string] {
+            this.clear()
             if(Object.keys(this.tree).length !== 0) {
                 return [false, "please call 'clear' before 'init'"]
             }
@@ -88,7 +90,6 @@ namespace FileTree {
 
         /**
          * @description 传入当前树的某个节点的uuid, 尝试展开1层其子树
-         * @deprecated
          */
         expand(nodeId: string): [boolean, string] {
             if(Object.keys(this.tree).length === 0) {
