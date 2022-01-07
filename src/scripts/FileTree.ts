@@ -96,7 +96,6 @@ namespace FileTree {
             }
             else {
                 // 搜索子树根节点 - 获取其路径
-                console.log(this.tree, nodeId)
                 const childTreeRootNode = dfs( clone(this.tree), (node: FileTreeNode) => { return node.uuid === nodeId })
                 // 子树根节点未找到 - 返回
                 if(childTreeRootNode === null) { return [false, 'no such node on the tree'] }
