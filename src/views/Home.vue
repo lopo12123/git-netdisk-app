@@ -110,6 +110,7 @@ export default defineComponent({
         // endregion
 
         // region 点击磁盘进入下一页(初始化文件树)
+        sessionStorage.clear()
         const diskClick = (diskName: string) => {
             sendIpcTree('INIT', uuid(), diskName+'/')
                 .then((args) => {

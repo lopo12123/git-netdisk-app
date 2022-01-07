@@ -71,7 +71,6 @@ namespace FileTree {
          * @description 传入路径, 以此为根构建文件树类
          */
         init(rootPath: string): [boolean, string] {
-            this.clear()
             if(Object.keys(this.tree).length !== 0) {
                 return [false, "please call 'clear' before 'init'"]
             }
@@ -97,6 +96,7 @@ namespace FileTree {
             }
             else {
                 // 搜索子树根节点 - 获取其路径
+                console.log(this.tree, nodeId)
                 const childTreeRootNode = dfs( clone(this.tree), (node: FileTreeNode) => { return node.uuid === nodeId })
                 // 子树根节点未找到 - 返回
                 if(childTreeRootNode === null) { return [false, 'no such node on the tree'] }

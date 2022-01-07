@@ -7,8 +7,8 @@
                 Click on the face above to back and try again.
             </div>
         </div>
-        <el-table
-            v-if="ifTree" class="tree-table"
+        <el-table v-if="ifTree"
+            class="tree-table" ref="treeTable"
             :data="treeData" row-key="uuid"
             @row-contextmenu="contextMenu"
             height="100%" stripe>
@@ -29,20 +29,19 @@
             <el-table-column label="路径" prop="dir"/>
 
         </el-table>
-        <context-menu :style="`left: ${left}px; top: ${top}px`"
-                      @item-click="itemClick"/>
+        <context-menu :style="`left: ${left}px; top: ${top}px`" @item-click="itemClick"/>
     </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount, Ref, ref} from "vue";
+import {defineComponent, onBeforeUnmount, onMounted, Ref, ref} from "vue";
 import {useRouter} from "vue-router";
 import {v4 as uuid} from "uuid";
 import {FileTreeNode} from "@/scripts/interface";
 import {ElMessage, ElTable, ElTableColumn} from "element-plus";
 import {FolderOpenOutlined, FileTextOutlined} from "@ant-design/icons-vue";
 import ContextMenu from "@/components/Tree/ContextMenu.vue"
-import {sendIpcExplorer} from "@/scripts/Ipc";
+import {sendIpcExplorer, sendIpcTree} from "@/scripts/Ipc";
 
 export default defineComponent({
     name: "Tree",
@@ -54,16 +53,13 @@ export default defineComponent({
     setup() {
         const router = useRouter()
         const ifTree = ref(false)
+        const treeTable: Ref<(typeof ElTable) | null> = ref(null)
         const treeData: Ref<FileTreeNode[]> = ref([])
         const treeJsonStr = sessionStorage.getItem('tree')
         try {
             if(treeJsonStr === null) throw new Error('NULL')
             treeData.value = [JSON.parse(treeJsonStr)]
             ifTree.value = true
-            // ElMessage({
-            //     type: 'success',
-            //     message: 'parse file tree successfully'
-            // })
         }
         catch (e) {
             ifTree.value = false
@@ -91,10 +87,33 @@ export default defineComponent({
         }
         const itemClick = (type: 'Expansion' | 'Explorer') => {
             if(type === 'Expansion') {
-                // ipc expand
+                if(rowClicked === null) return;
+                else if(rowClicked.type === 'FILE') {
+                    ElMessage({
+                        type: 'info',
+                        message: 'this is not a directory'
+                    })
+                }
+                else if(rowClicked.children && rowClicked.children.length > 0) {
+                    treeTable.value!.toggleRowExpansion(rowClicked)
+                }
+                else {
+                    sendIpcTree('EXPAND', uuid(), rowClicked.uuid)
+                        .then((args) => {
+                            treeData.value = [args.tree]
+                            sessionStorage.setItem('tree', JSON.stringify(args.tree))
+                            ElMessage({
+                                type: args.result ? 'success' : 'warning',
+                                message: args.reason
+                            })
+                            setTimeout(() => {
+                                treeTable.value!.toggleRowExpansion(rowClicked)
+                            }, 0)
+                        })
+                }
             }
             else if(type === 'Explorer') {
-                if(rowClicked === null) return
+                if(rowClicked === null) return;
                 else if(rowClicked.type === 'DIR') {
                     sendIpcExplorer({uuid: uuid(), dir: rowClicked.dir+rowClicked.base})
                 }
@@ -102,9 +121,7 @@ export default defineComponent({
                     sendIpcExplorer({uuid: uuid(), dir: rowClicked.dir})
                 }
             }
-            console.log(type, '了')
         }
-
 
         document.addEventListener('click', hideContextMenu)
         onBeforeUnmount(() => {
@@ -112,7 +129,7 @@ export default defineComponent({
         })
 
         return {
-            ifTree, treeData, backToHome,
+            ifTree, treeTable, treeData, backToHome,
             left, top, contextMenu, itemClick,
         }
     }

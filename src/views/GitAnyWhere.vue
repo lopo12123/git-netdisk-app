@@ -13,7 +13,7 @@
 import {defineComponent, ref} from "vue";
 import {ElMessage} from "element-plus";
 import {v4 as uuid} from "uuid";
-import FileSelector from "@/components/Home/FileSelector.vue";
+import FileSelector from "@/components/GitAnyWhere/FileSelector.vue";
 import {sendIpcHome} from "@/scripts/Ipc";
 
 export default defineComponent({

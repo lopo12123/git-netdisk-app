@@ -80,6 +80,7 @@ app.on('ready', async () => {
     // region [Tree] 点击选择文件 - 解析文件子树并返回最新树
     ipcMain.on('Tree', (ev, args: {type: 'INIT' | 'EXPAND', uuid: string, pathOrNodeId: string}) => {
         if(args.type === 'INIT') {
+            fileTreeStore.clear()
             const [result, reason] = fileTreeStore.init(args.pathOrNodeId)
             ev.reply('Tree', { result, reason, tree: fileTreeStore.tree, uuid: args.uuid })
         }
