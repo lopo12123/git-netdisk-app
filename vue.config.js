@@ -4,13 +4,13 @@ module.exports = {
             nodeIntegration: true,
 
             // 打包配置
-            // builderOptions: {
-            //     appId: 'com.gitApp.app',
-            //     productName: 'git-it',
-            //     win: {
-            //         icon: 'public/git.png'
-            //     }
-            // },
+            builderOptions: {
+                appId: 'com.catExplorer.app',
+                productName: 'cat-explorer',
+                win: {
+                    icon: 'public/logo.ico'
+                }
+            },
 
         }
     }
