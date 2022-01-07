@@ -1,14 +1,17 @@
 <template>
     <div id="app-nav-bar">
+
+        <img class="logo" style="margin-left: 10px" src="../assets/cat.png" alt>
+
         <a-dropdown>
-            <custom-button btn-type="MORE" @btn-click="navBarBtn" style="margin-left: 10px"></custom-button>
+            <custom-button btn-type="MORE" @btn-click="navBarBtn"></custom-button>
             <template #overlay>
                 <a-menu>
                     <a-menu-item @click="handleCommand('HOME')">
                         <home-outlined/>
                         <span class="txt">Back To Home</span>
                     </a-menu-item>
-                    <a-menu-item @click="handleCommand('SETTING')">
+                    <a-menu-item @click="handleCommand('SETTING')" disabled>
                         <setting-outlined/>
                         <span class="txt">Setting</span>
                     </a-menu-item>
@@ -110,7 +113,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-$btn-number: 5;
+$btn-number: 6;
 
 #app-nav-bar {
     position: relative;
@@ -119,6 +122,12 @@ $btn-number: 5;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+
+    .logo {
+        position: relative;
+        width: 30px;
+        height: 30px;
+    }
 
     .placeholder {
         width: calc(100% - #{$btn-number} * 30px - #{$btn-number} * 10px - 20px);
