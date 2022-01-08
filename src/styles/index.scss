@@ -15,6 +15,17 @@
     }
 }
 
+// 用于复制的隐藏input
+.iptForCopy {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    top: -100px;
+    left: -100px;
+    border: none;
+    outline: none;
+}
+
 // 消息提示框样式
 .el-message {
     width: fit-content;
