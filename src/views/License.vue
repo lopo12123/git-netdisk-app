@@ -13,7 +13,7 @@
                     {{ context_p2 }} <br> <br>
                     {{ context_p3 }} <br> <br>
                 </div>
-                <input id="toCopy" ref="toCopy" type="text" :value="title+copyright+context_p1+context_p2+context_p3">
+                <input class="iptForCopy" ref="toCopy" type="text" :value="title+copyright+context_p1+context_p2+context_p3">
             </div>
             <template #overlay>
                 <a-menu>
@@ -94,16 +94,6 @@ export default defineComponent({
         font-style: italic;
         word-break: break-all;
         overflow-y: auto;
-
-        #toCopy {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            top: -100px;
-            left: -100px;
-            border: none;
-            outline: none;
-        }
     }
 }
 </style>
