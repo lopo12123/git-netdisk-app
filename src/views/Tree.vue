@@ -7,12 +7,13 @@
                 Click on the face above to back and try again.
             </div>
         </div>
+
         <el-table v-if="ifTree"
             class="tree-table" ref="treeTable"
             :data="treeData" row-key="uuid"
             @row-contextmenu="contextMenu"
+            @row-dblclick="doExpand"
             height="100%" stripe>
-
             <el-table-column label="类型">
                 <template #default="scope">
                     <folder-open-outlined v-if="scope.row.type === 'DIR'"/>
@@ -26,20 +27,26 @@
 
             <el-table-column label="扩展名" prop="ext"/>
 
-            <el-table-column label="路径" prop="dir"/>
-
+            <el-table-column label="路径" width="70px">
+                <template #default="scope">
+                    <copy-outlined class="copy-dir" @click="copyDir(scope)"/>
+                </template>
+            </el-table-column>
         </el-table>
+
+        <input class="iptForCopy" ref="toCopy" type="text">
+
         <context-menu :style="`left: ${left}px; top: ${top}px`" @item-click="itemClick"/>
     </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onBeforeUnmount, onMounted, Ref, ref} from "vue";
+import {defineComponent, onBeforeUnmount, Ref, ref} from "vue";
 import {useRouter} from "vue-router";
 import {v4 as uuid} from "uuid";
 import {FileTreeNode} from "@/scripts/interface";
 import {ElMessage, ElTable, ElTableColumn} from "element-plus";
-import {FolderOpenOutlined, FileTextOutlined} from "@ant-design/icons-vue";
+import {FolderOpenOutlined, FileTextOutlined, CopyOutlined} from "@ant-design/icons-vue";
 import ContextMenu from "@/components/Tree/ContextMenu.vue"
 import {sendIpcExplorer, sendIpcTree} from "@/scripts/Ipc";
 
@@ -47,7 +54,7 @@ export default defineComponent({
     name: "Tree",
     components: {
         ElTable, ElTableColumn,
-        FolderOpenOutlined, FileTextOutlined,
+        FolderOpenOutlined, FileTextOutlined, CopyOutlined,
         ContextMenu
     },
     setup() {
@@ -75,6 +82,8 @@ export default defineComponent({
         let rowClicked: FileTreeNode | null = null  // 存储当前row用于展开
         const [left, top] = [ref(-500), ref(-500)]  // 右键菜单的位置
         const contextMenu = (row: any, column: any, e: PointerEvent) => {
+            e.preventDefault()
+            e.stopPropagation()
             const { clientWidth, clientHeight } = document.body
             const { clientX, clientY } = e
             left.value = clientX < (clientWidth - 130) ? (clientX + 5) : (clientX - 130)
@@ -84,6 +93,12 @@ export default defineComponent({
         const hideContextMenu = () => {
             left.value = -500
             top.value = -500
+        }
+        const doExpand = (row: any, column: any, e: PointerEvent) => {
+            e.preventDefault()
+            e.stopPropagation()
+            rowClicked = row
+            itemClick('Expansion')
         }
         const itemClick = (type: 'Expansion' | 'Explorer') => {
             if(type === 'Expansion') {
@@ -123,6 +138,25 @@ export default defineComponent({
             }
         }
 
+        const toCopy: Ref<HTMLInputElement|null> = ref(null)
+        const copyDir = (scope: any) => {
+            if(toCopy.value === null) {
+                ElMessage({
+                    type: 'info',
+                    message: 'can`t copy it now, try it later'
+                })
+            }
+            else {
+                toCopy.value!.value = scope.row.dir + scope.row.base
+                toCopy.value?.select()
+                const result = document.execCommand('copy')
+                ElMessage({
+                    type: result ? 'success' : 'warning',
+                    message: result ? 'copy to clipboard successfully' : 'copy to clipboard failed'
+                })
+            }
+        }
+
         document.addEventListener('click', hideContextMenu)
         onBeforeUnmount(() => {
             document.removeEventListener('click', hideContextMenu)
@@ -130,7 +164,8 @@ export default defineComponent({
 
         return {
             ifTree, treeTable, treeData, backToHome,
-            left, top, contextMenu, itemClick,
+            left, top, contextMenu, doExpand, itemClick,
+            toCopy, copyDir,
         }
     }
 })
@@ -181,6 +216,13 @@ export default defineComponent({
         position: relative;
         width: 100%;
         height: 100%;
+
+        .copy-dir {
+            cursor: pointer;
+            &:hover:not(:active) {
+                color: #40cead;
+            }
+        }
     }
 
     ::v-deep {
